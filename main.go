@@ -79,14 +79,14 @@ func sortLibraries(libraries []*Library) []*Library {
 		libraryBooksScore := calcLibBookScore(lib.books)
 		signupDays := lib.signup
 
-		bookShippableCoef := 1
-		nBooksCoef := 1
-		libraryBooksScoreCoef := 1
-		signupDaysCoef := 1
+		bookShippableCoef := 1000
+		nBooksCoef := 100
+		libraryBooksScoreCoef := 100
+		signupDaysCoef := 10
 
 		lib.libraryScore = ((bookShippable * bookShippableCoef) *
 			(nbooks * nBooksCoef) *
-			(libraryBooksScore * libraryBooksScoreCoef)) -
+			(libraryBooksScore * libraryBooksScoreCoef)) /
 			(signupDays * signupDaysCoef)
 	}
 
