@@ -14,12 +14,12 @@ func getConfig(line string) (books int, libraries int, days int) {
 	return
 }
 
-func buildBooks(scoreLine string, nBooks int) []Book {
+func buildBooks(scoreLine string, nBooks int) []*Book {
 	scores := strings.Split(scoreLine, " ")
-	books := make([]Book, nBooks)
+	books := make([]*Book, nBooks)
 
 	for i := 0; i < nBooks; i++ {
-		books[i] = Book{
+		books[i] = &Book{
 			id:    i,
 			score: toint(scores[i]),
 		}
@@ -27,7 +27,7 @@ func buildBooks(scoreLine string, nBooks int) []Book {
 	return books
 }
 
-func buildLibraries(lines []string, nLibraries int, availableBooks []Book) []*Library {
+func buildLibraries(lines []string, nLibraries int, availableBooks []*Book) []*Library {
 	libraries := make([]*Library, nLibraries)
 	for i := 0; i < nLibraries*2; i += 2 {
 		line1 := lines[i]
@@ -41,7 +41,7 @@ func buildLibraries(lines []string, nLibraries int, availableBooks []Book) []*Li
 	return libraries
 }
 
-func buildLibrary(line1, line2 string, availableBooks []Book) *Library {
+func buildLibrary(line1, line2 string, availableBooks []*Book) *Library {
 	libraryConfig := strings.Split(line1, " ")
 
 	nBooks := toint(libraryConfig[0])
@@ -51,7 +51,7 @@ func buildLibrary(line1, line2 string, availableBooks []Book) *Library {
 		bookShippable: toint(libraryConfig[2]),
 	}
 
-	books := make([]Book, nBooks)
+	books := make([]*Book, nBooks)
 	for i, stringBookid := range strings.Split(line2, " ") {
 		intBookID := toint(stringBookid)
 		books[i] = availableBooks[intBookID]

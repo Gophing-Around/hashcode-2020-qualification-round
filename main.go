@@ -13,13 +13,13 @@ type Library struct {
 	nBooks        int
 	signup        int
 	bookShippable int
-	books         []Book
+	books         []*Book
 
 	firstDayAvailable int
 
 	sendAttempts int
 	sentBookIDs  []string
-	sentBooks    []Book
+	sentBooks    []*Book
 
 	libraryScore int
 }
@@ -32,12 +32,12 @@ type Book struct {
 
 func main() {
 	files := []string{
-		// "a", // base
-		// "b", // 100k books | 100 libraries | 1000 days
-		"c", // 100k books | 10k libraries | 100k days
+		"a", // base
+		"b", // 100k books | 100 libraries | 1000 days
+		// "c", // 100k books | 10k libraries | 100k days
 		// "d", // 78600 books | 30k libraries | 30001 days
-		// "e", // 100k books | 1k libraries | 200 days
-		// "f", // 100k books | 1k libraries | 700 days
+		"e", // 100k books | 1k libraries | 200 days
+		"f", // 100k books | 1k libraries | 700 days
 	}
 
 	for _, fileName := range files {
@@ -51,16 +51,8 @@ func main() {
 		books := buildBooks(configLines[1], nBooks)
 		libraries := buildLibraries(configLines[2:], nLibraries, books)
 
-		// Sorting:
-		//  - n giorni signup
-		//  - n libri unici in libreria,
-		//  - libri inviabili al giorno
-		//  - score dei libri
-
 		sortedLibraries := sortLibraries(libraries)
-
 		outLibraries := algorithm(nDays, sortedLibraries, books)
-
 		scannedLibraries := findLibrariesScanned(outLibraries)
 
 		fmt.Printf("Scanned libraries: %d - Total libraries: %d\n", len(scannedLibraries), len(libraries))
@@ -86,6 +78,12 @@ func main() {
 }
 
 func sortLibraries(libraries []*Library) []*Library {
+	// Sorting:
+	//  - n giorni signup
+	//  - n libri unici in libreria,
+	//  - libri inviabili al giorno
+	//  - score dei libri
+
 	for _, lib := range libraries {
 		bookShippable := lib.bookShippable
 		nbooks := lib.nBooks
@@ -93,11 +91,12 @@ func sortLibraries(libraries []*Library) []*Library {
 		signupDays := lib.signup
 
 		bookShippableCoef := 1
-		libraryBooksScoreCoef := 100
-		signupDaysCoef := 1000
+		libraryBooksScoreCoef := 1
+		signupDaysCoef := 1
 
 		lib.libraryScore = ((bookShippable * bookShippableCoef) *
-			(libraryBooksScore * libraryBooksScoreCoef)) /
+			(nbooks * 1) *
+			(libraryBooksScore * libraryBooksScoreCoef)) *
 			(signupDays * signupDaysCoef)
 	}
 
@@ -106,6 +105,7 @@ func sortLibraries(libraries []*Library) []*Library {
 		libB := libraries[j]
 		return libA.libraryScore > libB.libraryScore
 	})
+
 	return libraries
 }
 
@@ -127,12 +127,12 @@ func updateLibraryScores(libraries []*Library, sentbooks map[int]bool) []*Librar
 	sort.Slice(libraries, func(i, j int) bool {
 		libA := libraries[i]
 		libB := libraries[j]
-		return libA.libraryScore > libB.libraryScore
+		return libA.libraryScore < libB.libraryScore
 	})
 	return libraries
 }
 
-func algorithm(nDays int, libraries []*Library, books []Book) []*Library {
+func algorithm(nDays int, libraries []*Library, books []*Book) []*Library {
 	sentbooks := make(map[int]bool)
 
 	startingDay := 0
@@ -156,7 +156,7 @@ func algorithm(nDays int, libraries []*Library, books []Book) []*Library {
 
 			shippablePerLibrary := library.bookShippable
 			for _, book := range library.books {
-				if shippablePerLibrary == 0 {
+				if shippablePerLibrary < 0 {
 					break
 				}
 
