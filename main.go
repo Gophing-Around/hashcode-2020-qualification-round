@@ -19,6 +19,8 @@ type Library struct {
 
 	sentBookIDs []string
 	sentBooks   []Book
+
+	libraryScore int
 }
 
 // Book .
@@ -49,6 +51,7 @@ func main() {
 		libraries := buildLibraries(configLines[2:], nLibraries, books)
 
 		// Sorting:
+		//  - n giorni signup
 		//  - n libri unici in libreria,
 		//  - libri inviabili al giorno
 		//  - score dei libri
@@ -71,10 +74,23 @@ func main() {
 }
 
 func sortLibraries(libraries []*Library) []*Library {
-	sort.Slice(libraries, func(i, j int) bool {
-		return libraries[i].bookShippable > libraries[j].bookShippable
-	})
+	for _, lib := range libraries {
+		bookShippable := lib.bookShippable
+		uniqueBooks := lib.nBooks
+		signup := lib.signup
 
+		a := 1
+		b := 1
+		c := 1
+
+		lib.libraryScore = ((bookShippable * a) * (uniqueBooks * b)) - (signup * c)
+	}
+
+	sort.Slice(libraries, func(i, j int) bool {
+		libA := libraries[i]
+		libB := libraries[j]
+		return libA.libraryScore > libB.libraryScore
+	})
 	return libraries
 }
 
