@@ -35,7 +35,7 @@ func main() {
 	}
 
 	for _, fileName := range files {
-		fmt.Printf("--------------------------------------------------------")
+		fmt.Printf("--------------------------------------------------------\n")
 		fmt.Printf("****************** INPUT: %s\n", fileName)
 
 		inputSet := readFile(fmt.Sprintf("./inputFiles/%s.in", fileName))
