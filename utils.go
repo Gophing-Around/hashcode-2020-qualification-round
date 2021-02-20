@@ -20,3 +20,10 @@ func toint(num string) int {
 	}
 	return res
 }
+
+func calcLibBookScore(books []Book) (score int) {
+	for _, book := range books {
+		score += book.score
+	}
+	return
+}

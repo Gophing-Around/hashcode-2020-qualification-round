@@ -75,14 +75,19 @@ func main() {
 func sortLibraries(libraries []*Library) []*Library {
 	for _, lib := range libraries {
 		bookShippable := lib.bookShippable
-		uniqueBooks := lib.nBooks
-		signup := lib.signup
+		nbooks := lib.nBooks
+		libraryBooksScore := calcLibBookScore(lib.books)
+		signupDays := lib.signup
 
-		a := 1
-		b := 1
-		c := 1
+		bookShippableCoef := 1
+		nBooksCoef := 1
+		libraryBooksScoreCoef := 1
+		signupDaysCoef := 1
 
-		lib.libraryScore = ((bookShippable * a) * (uniqueBooks * b)) - (signup * c)
+		lib.libraryScore = ((bookShippable * bookShippableCoef) *
+			(nbooks * nBooksCoef) *
+			(libraryBooksScore * libraryBooksScoreCoef)) -
+			(signupDays * signupDaysCoef)
 	}
 
 	sort.Slice(libraries, func(i, j int) bool {
