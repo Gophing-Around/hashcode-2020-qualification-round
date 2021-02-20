@@ -32,12 +32,12 @@ type Book struct {
 
 func main() {
 	files := []string{
-		"a", // base
-		"b", // 100k books | 100 libraries | 1000 days
-		// "c", // 100k books | 10k libraries | 100k days
-		// "d", // 78600 books | 30k libraries | 30001 days
-		"e", // 100k books | 1k libraries | 200 days
-		"f", // 100k books | 1k libraries | 700 days
+		// "a", // base
+		// "b", // 100k books | 100 libraries | 1000 days
+		//"c", // 100k books | 10k libraries | 100k days
+		"d", // 78600 books | 30k libraries | 30001 days
+		// "e", // 100k books | 1k libraries | 200 days
+		// "f", // 100k books | 1k libraries | 700 days
 	}
 
 	for _, fileName := range files {
@@ -90,14 +90,14 @@ func sortLibraries(libraries []*Library) []*Library {
 		libraryBooksScore := calcLibBookScore(lib.books) / nbooks
 		signupDays := lib.signup
 
-		bookShippableCoef := 1
-		libraryBooksScoreCoef := 1
+		bookShippableCoef := 100
+		libraryBooksScoreCoef := 100
 		signupDaysCoef := 1
 
 		lib.libraryScore = ((bookShippable * bookShippableCoef) *
-			(nbooks * 1) *
-			(libraryBooksScore * libraryBooksScoreCoef)) *
-			(signupDays * signupDaysCoef)
+			 (nbooks * 1) *
+			 (libraryBooksScore * libraryBooksScoreCoef)) *
+			 (signupDays * signupDaysCoef)
 	}
 
 	sort.Slice(libraries, func(i, j int) bool {
@@ -110,7 +110,7 @@ func sortLibraries(libraries []*Library) []*Library {
 }
 
 func updateLibraryScores(libraries []*Library, sentbooks map[int]bool) []*Library {
-	uniqueBooksAvailableCoef := 1
+	uniqueBooksAvailableCoef := 10
 
 	for _, lib := range libraries {
 		uniqueBooksAvailable := 0
@@ -121,7 +121,7 @@ func updateLibraryScores(libraries []*Library, sentbooks map[int]bool) []*Librar
 			}
 		}
 
-		lib.libraryScore *= uniqueBooksAvailable * uniqueBooksAvailableCoef
+		lib.libraryScore += uniqueBooksAvailable * uniqueBooksAvailableCoef
 	}
 
 	sort.Slice(libraries, func(i, j int) bool {
@@ -142,7 +142,6 @@ func algorithm(nDays int, libraries []*Library, books []*Book) []*Library {
 	}
 
 	for day := 0; day < nDays; day++ {
-
 		libraries = updateLibraryScores(libraries, sentbooks)
 
 		for _, library := range libraries {
