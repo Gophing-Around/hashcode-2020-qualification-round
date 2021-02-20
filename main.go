@@ -33,7 +33,7 @@ func main() {
 	files := []string{
 		"a",
 		"b",
-		// "c",
+		"c",
 		// "d",
 		// "e",
 		// "f",
