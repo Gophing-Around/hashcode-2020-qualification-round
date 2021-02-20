@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -55,6 +56,12 @@ func buildLibrary(line1, line2 string, availableBooks []Book) *Library {
 		intBookID := toint(stringBookid)
 		books[i] = availableBooks[intBookID]
 	}
+
+	sort.Slice(books, func(i, j int) bool {
+		bookA := books[i]
+		bookB := books[j]
+		return bookA.score > bookB.score
+	})
 	library.books = books
 	return &library
 }

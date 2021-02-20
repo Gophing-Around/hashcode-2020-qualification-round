@@ -61,7 +61,6 @@ func main() {
 		outLibraries := algorithm(nDays, sortedLibraries, books)
 
 		scannedLibraries := findLibrariesScanned(outLibraries)
-
 		result := fmt.Sprintf("%d\n", len(scannedLibraries))
 		for _, lib := range scannedLibraries {
 			result += fmt.Sprintf("%s %d\n", lib.id, len((lib.sentBooks)))
