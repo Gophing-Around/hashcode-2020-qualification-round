@@ -31,12 +31,12 @@ type Book struct {
 
 func main() {
 	files := []string{
-		"a",
-		"b",
-		"c",
-		// "d",
-		// "e",
-		// "f",
+		"a", // base
+		"b", // 100k books | 100 libraries | 1000 d
+		"c", // 100k books | 10k libraries | 100k d
+		"d", // 78600 books | 30k libraries | 30001 d
+		"e", // 100k books | 1k libraries | 200d
+		"f", // 100k books | 1k libraries | 700d
 	}
 
 	for _, fileName := range files {
