@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"sort"
 	"strings"
 )
 
+// Library .
 type Library struct {
 	id            string
 	nBooks        int
@@ -19,6 +21,7 @@ type Library struct {
 	sentBooks   []Book
 }
 
+// Book .
 type Book struct {
 	id    int
 	score int
@@ -28,14 +31,13 @@ func main() {
 	files := []string{
 		"a",
 		"b",
-		"c",
-		"d",
-		"e",
-		"f",
+		// "c",
+		// "d",
+		// "e",
+		// "f",
 	}
 
 	for _, fileName := range files {
-		fmt.Printf("--------------------------------------------------------\n")
 		fmt.Printf("****************** INPUT: %s\n", fileName)
 
 		inputSet := readFile(fmt.Sprintf("./inputFiles/%s.in", fileName))
@@ -46,7 +48,14 @@ func main() {
 		books := buildBooks(configLines[1], nBooks)
 		libraries := buildLibraries(configLines[2:], nLibraries, books)
 
-		outLibraries := algorithm(nDays, libraries, books)
+		// Sorting:
+		//  - n libri unici in libreria,
+		//  - libri inviabili al giorno
+		//  - score dei libri
+
+		sortedLibraries := sortLibraries(libraries)
+
+		outLibraries := algorithm(nDays, sortedLibraries, books)
 
 		scannedLibraries := findLibrariesScanned(outLibraries)
 
@@ -59,6 +68,14 @@ func main() {
 		result = strings.TrimSpace(result)
 		ioutil.WriteFile(fmt.Sprintf("./result/%s.out", fileName), []byte(result), 0644)
 	}
+}
+
+func sortLibraries(libraries []*Library) []*Library {
+	sort.Slice(libraries, func(i, j int) bool {
+		return libraries[i].bookShippable > libraries[j].bookShippable
+	})
+
+	return libraries
 }
 
 func algorithm(nDays int, libraries []*Library, books []Book) []*Library {
