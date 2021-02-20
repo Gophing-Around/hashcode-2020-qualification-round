@@ -31,11 +31,11 @@ type Book struct {
 
 func main() {
 	files := []string{
-		"a", // base
-		"b", // 100k books | 100 libraries | 1000 days
-		"c", // 100k books | 10k libraries | 100k days
-		"d", // 78600 books | 30k libraries | 30001 days
-		"e", // 100k books | 1k libraries | 200 days
+		// "a", // base
+		// "b", // 100k books | 100 libraries | 1000 days
+		// "c", // 100k books | 10k libraries | 100k days
+		// "d", // 78600 books | 30k libraries | 30001 days
+		// "e", // 100k books | 1k libraries | 200 days
 		"f", // 100k books | 1k libraries | 700 days
 	}
 
@@ -91,14 +91,14 @@ func sortLibraries(libraries []*Library) []*Library {
 		libraryBooksScore := calcLibBookScore(lib.books)
 		signupDays := lib.signup
 
-		bookShippableCoef := 1
-		nBooksCoef := 1
-		libraryBooksScoreCoef := 1
-		signupDaysCoef := 1
+		bookShippableCoef := 1000
+		nBooksCoef := 100
+		libraryBooksScoreCoef := 100
+		signupDaysCoef := 10
 
 		lib.libraryScore = ((bookShippable * bookShippableCoef) *
 			(nbooks * nBooksCoef) *
-			(libraryBooksScore * libraryBooksScoreCoef)) -
+			(libraryBooksScore * libraryBooksScoreCoef)) /
 			(signupDays * signupDaysCoef)
 	}
 
