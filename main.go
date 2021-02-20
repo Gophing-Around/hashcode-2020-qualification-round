@@ -32,11 +32,11 @@ type Book struct {
 func main() {
 	files := []string{
 		"a", // base
-		"b", // 100k books | 100 libraries | 1000 d
-		"c", // 100k books | 10k libraries | 100k d
-		"d", // 78600 books | 30k libraries | 30001 d
-		"e", // 100k books | 1k libraries | 200d
-		"f", // 100k books | 1k libraries | 700d
+		"b", // 100k books | 100 libraries | 1000 days
+		"c", // 100k books | 10k libraries | 100k days
+		"d", // 78600 books | 30k libraries | 30001 days
+		"e", // 100k books | 1k libraries | 200 days
+		"f", // 100k books | 1k libraries | 700 days
 	}
 
 	for _, fileName := range files {
@@ -61,11 +61,23 @@ func main() {
 		outLibraries := algorithm(nDays, sortedLibraries, books)
 
 		scannedLibraries := findLibrariesScanned(outLibraries)
+
+		fmt.Printf("Scanned libraries: %d - Total libraries: %d\n", len(scannedLibraries), len(libraries))
+
 		result := fmt.Sprintf("%d\n", len(scannedLibraries))
+		mean := 0.0
 		for _, lib := range scannedLibraries {
+			// fmt.Printf("Sent books for library %s: %d\n", lib.id, len(lib.sentBooks))
+			total := lib.nBooks
+			sent := len(lib.sentBooks)
+			percent := sent / total
+			mean = (mean + float64(percent)) / float64(len(scannedLibraries))
+
 			result += fmt.Sprintf("%s %d\n", lib.id, len((lib.sentBooks)))
 			result += fmt.Sprintf("%s\n", strings.Join(lib.sentBookIDs, " "))
 		}
+
+		fmt.Printf("Sent book mean: %.000f\n", mean)
 
 		result = strings.TrimSpace(result)
 		ioutil.WriteFile(fmt.Sprintf("./result/%s.out", fileName), []byte(result), 0644)
