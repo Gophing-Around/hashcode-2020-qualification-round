@@ -34,9 +34,9 @@ func main() {
 	files := []string{
 		// "a", // base
 		// "b", // 100k books | 100 libraries | 1000 days
-		// "c", // 100k books | 10k libraries | 100k days
+		"c", // 100k books | 10k libraries | 100k days
 		// "d", // 78600 books | 30k libraries | 30001 days
-		"e", // 100k books | 1k libraries | 200 days
+		// "e", // 100k books | 1k libraries | 200 days
 		// "f", // 100k books | 1k libraries | 700 days
 	}
 
