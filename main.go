@@ -17,8 +17,9 @@ type Library struct {
 
 	firstDayAvailable int
 
-	sentBookIDs []string
-	sentBooks   []Book
+	sendAttempts int
+	sentBookIDs  []string
+	sentBooks    []Book
 
 	libraryScore int
 }
@@ -108,6 +109,29 @@ func sortLibraries(libraries []*Library) []*Library {
 	return libraries
 }
 
+func updateLibraryScores(libraries []*Library, sentbooks map[int]bool) []*Library {
+	uniqueBooksAvailableCoef := 1
+
+	for _, lib := range libraries {
+		uniqueBooksAvailable := 0
+
+		for _, book := range lib.books {
+			if sent, ok := sentbooks[book.id]; !sent || !ok {
+				uniqueBooksAvailable++
+			}
+		}
+
+		lib.libraryScore *= uniqueBooksAvailable * uniqueBooksAvailableCoef
+	}
+
+	sort.Slice(libraries, func(i, j int) bool {
+		libA := libraries[i]
+		libB := libraries[j]
+		return libA.libraryScore > libB.libraryScore
+	})
+	return libraries
+}
+
 func algorithm(nDays int, libraries []*Library, books []Book) []*Library {
 	sentbooks := make(map[int]bool)
 
@@ -118,18 +142,25 @@ func algorithm(nDays int, libraries []*Library, books []Book) []*Library {
 	}
 
 	for day := 0; day < nDays; day++ {
+
+		libraries = updateLibraryScores(libraries, sentbooks)
+
 		for _, library := range libraries {
 			if library.firstDayAvailable < day {
 				continue
 			}
 
-			shippablePerLibrary := library.bookShippable
+			if library.sendAttempts == library.nBooks {
+				continue
+			}
 
+			shippablePerLibrary := library.bookShippable
 			for _, book := range library.books {
 				if shippablePerLibrary == 0 {
 					break
 				}
 
+				library.sendAttempts++
 				if sent, ok := sentbooks[book.id]; !sent || !ok {
 					library.sentBooks = append(library.sentBooks, book)
 					library.sentBookIDs = append(library.sentBookIDs, fmt.Sprintf("%d", book.id))
