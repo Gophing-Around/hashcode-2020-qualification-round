@@ -27,3 +27,8 @@ func calcLibBookScore(books []*Book) (score int) {
 	}
 	return
 }
+
+func removeElement(s []*Library, i int) []*Library {
+	s[len(s)-1], s[i] = s[i], s[len(s)-1]
+	return s[:len(s)-1]
+}

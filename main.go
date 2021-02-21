@@ -34,10 +34,10 @@ func main() {
 	files := []string{
 		// "a", // base
 		// "b", // 100k books | 100 libraries | 1000 days
-		//"c", // 100k books | 10k libraries | 100k days
-		"d", // 78600 books | 30k libraries | 30001 days
 		// "e", // 100k books | 1k libraries | 200 days
 		// "f", // 100k books | 1k libraries | 700 days
+		"c", // 100k books | 10k libraries | 100k days
+		// "d", // 78600 books | 30k libraries | 30001 days
 	}
 
 	for _, fileName := range files {
@@ -51,7 +51,7 @@ func main() {
 		books := buildBooks(configLines[1], nBooks)
 		libraries := buildLibraries(configLines[2:], nLibraries, books)
 
-		sortedLibraries := sortLibraries(libraries)
+		sortedLibraries := libraries // sortLibraries(libraries)
 		outLibraries := algorithm(nDays, sortedLibraries, books)
 		scannedLibraries := findLibrariesScanned(outLibraries)
 
@@ -132,30 +132,92 @@ func updateLibraryScores(libraries []*Library, sentbooks map[int]bool) []*Librar
 	return libraries
 }
 
-func algorithm(nDays int, libraries []*Library, books []*Book) []*Library {
-	sentbooks := make(map[int]bool)
+func findBestLibrary(libraries []*Library, remainingDays int, sentbooks map[int]bool) (int, *Library) {
+	booksScoreCoef := 100
+	signupDaysCoef := 1000
+	wastedTimeCoef := 1
 
-	startingDay := 0
-	for _, library := range libraries {
-		library.firstDayAvailable = startingDay + library.signup
-		startingDay += library.signup
+	maxScore, maxScoreIndex := -1, -1
+	for index, library := range libraries {
+		if library.signup > remainingDays {
+			continue
+		}
+
+		nBooksToTake := ( remainingDays - library.signup ) * library.bookShippable
+		count := 0
+		score := 0
+		for _, book := range library.books {
+			if count >= nBooksToTake {
+				break
+			}
+
+			if sent, ok := sentbooks[book.id]; !sent || !ok {
+				score += book.score
+				count++
+			}
+		}
+
+		wastedTimePenalty := nBooksToTake - count
+		if wastedTimePenalty <= 0 {
+			wastedTimePenalty = 1
+		} else {
+			wastedTimePenalty *= wastedTimeCoef
+		}
+
+		score = (score * booksScoreCoef)	/	((library.signup * signupDaysCoef) * wastedTimePenalty)
+		if score > maxScore {
+			maxScore = score
+			maxScoreIndex = index
+		}
 	}
 
+	if maxScore < 0 || maxScoreIndex < 0 {
+		return -1, nil
+	}
+
+	return maxScoreIndex, libraries[maxScoreIndex]
+}
+
+func algorithm(nDays int, origLibraries []*Library, books []*Book) []*Library {
+	sentbooks := make(map[int]bool)
+	signedUpLibraries := make([]*Library, 0)
+	libraries := origLibraries
+
+	// startingDay := 0
+	// for _, library := range libraries {
+	// 	library.firstDayAvailable = startingDay + library.signup
+	// 	startingDay += library.signup
+	// }
+
+
+	var currentSignignLibrary *Library = nil
+	indexToRemove := 0
+	lastSigningStartingDay := 0
 	for day := 0; day < nDays; day++ {
-		libraries = updateLibraryScores(libraries, sentbooks)
+		if currentSignignLibrary == nil {
+			if len(libraries) > 0 {
+				indexToRemove, currentSignignLibrary = findBestLibrary(libraries, nDays-day, sentbooks)
+				if indexToRemove > 0 && currentSignignLibrary != nil {
+					libraries = removeElement(libraries, indexToRemove)
+					lastSigningStartingDay = day
+				}
+			}
+		} else if (day - lastSigningStartingDay >= currentSignignLibrary.signup) {
+			signedUpLibraries = append(signedUpLibraries, currentSignignLibrary)
+			currentSignignLibrary = nil
+		}
 
-		for _, library := range libraries {
-			if library.firstDayAvailable < day {
+		// libraries = updateLibraryScores(libraries, sentbooks)
+
+		for _, library := range signedUpLibraries {
+			if library.sendAttempts >= library.nBooks {
 				continue
 			}
 
-			if library.sendAttempts == library.nBooks {
-				continue
-			}
-
+			library.sendAttempts = 0
 			shippablePerLibrary := library.bookShippable
 			for _, book := range library.books {
-				if shippablePerLibrary < 0 {
+				if shippablePerLibrary <= 0 {
 					break
 				}
 
@@ -170,7 +232,7 @@ func algorithm(nDays int, libraries []*Library, books []*Book) []*Library {
 		}
 	}
 
-	return libraries
+	return origLibraries
 }
 
 func findLibrariesScanned(libraries []*Library) []*Library {
